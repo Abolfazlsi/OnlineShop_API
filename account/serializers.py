@@ -6,6 +6,3 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['phone']
 
-    def validate(self, attrs):
-        if User.objects.filter(phone=attrs['phone']).exists():
-            return attrs
