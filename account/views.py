@@ -15,8 +15,8 @@ from .models import User, Otp
 from .serializers import UserRegisterSerializer
 from uuid import uuid4
 from random import randint
-
-
+import datetime
+from django.utils import timezone
 class UserRegisterViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = UserRegisterSerializer(data=request.data)

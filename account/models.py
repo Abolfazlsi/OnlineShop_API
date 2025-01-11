@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-
+from django.utils import timezone
+from datetime import timedelta
 
 class UserManager(BaseUserManager):
     def create_user(self, phone, password=None):
@@ -59,7 +60,11 @@ class Otp(models.Model):
     token = models.CharField(max_length=11, unique=True)
     phone = models.CharField(max_length=1, unique=True)
     code = models.SmallIntegerField()
-    expire = models.DateTimeField(auto_now_add=True)
+    expire = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.token
+    def save(self, *args, **kwargs):
+        if not self.expire:
+            self.expire = timezone.now() + timedelta(minutes=1)
+        super().save(*args, **kwargs)
