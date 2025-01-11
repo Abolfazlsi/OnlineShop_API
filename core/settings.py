@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework_simplejwt',
-    'django_celery_beat',
 
     # my apps
     'account.apps.AccountConfig'
@@ -119,8 +118,3 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
-
-
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
