@@ -1,6 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
-
+import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -24,9 +24,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
     # my apps
-    'account.apps.AccountConfig'
+    'account.apps.AccountConfig',
+    'product.apps.ProductConfig'
 ]
 
 MIDDLEWARE = [
@@ -103,6 +105,8 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 
@@ -115,6 +119,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
