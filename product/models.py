@@ -57,7 +57,7 @@ class Product(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
-
+# مدل برای امتیاز دادن به محصول
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="ratings")
@@ -79,6 +79,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user} - {self.text}"
 
+    # برای نمایش مقدار زمان گذشته از ایجاد کامنت
     def time_since_creation(self):
         time_delta = timezone.now() - self.created_at
         days = time_delta.days
@@ -103,6 +104,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
+# مدل برای تماش با مدیران فروشگاه
 class ContactUs(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contact_us")
     email = models.EmailField()

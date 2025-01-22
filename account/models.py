@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
+# مدل یوزر شخصی سازی شده
 class User(AbstractBaseUser):
     email = models.EmailField(
         verbose_name="email address",
@@ -56,6 +56,7 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
+# مدل otp برای ساختن کد ارسالی برای کاربر
 class Otp(models.Model):
     token = models.CharField(max_length=11, unique=True)
     phone = models.CharField(max_length=1, unique=True)

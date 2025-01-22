@@ -1,10 +1,11 @@
 from django.urls import path, re_path, include
-from product.views import ProductViewSet
+from product.views import HomePageView
 from rest_framework.routers import DefaultRouter
-router = DefaultRouter()
-router.register('products', ProductViewSet, basename='product')
+from product import views
 
 app_name = "product"
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', views.HomePageView.as_view(), name='home'),
+    path('product-detail/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
 ]
+

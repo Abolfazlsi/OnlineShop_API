@@ -24,6 +24,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("name", "price")
     search_fields = ("name",)
     list_filter = ("price", "category")
+    # نشان ندادن فیلد slug در پنل ادمین محصول
     exclude = ("slug",)
 
 

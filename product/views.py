@@ -1,23 +1,57 @@
-# from django.core.paginator import Paginator
-# from django.http import JsonResponse
-# from django.shortcuts import render, get_object_or_404
-# from django.views.generic import DetailView, TemplateView, View, ListView, CreateView
 import rest_framework.permissions
-
+from django.http import Http404
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from product.models import Product, Rating, Comment, Category, ContactUs
-# from django.shortcuts import get_object_or_404
-# from django.http import JsonResponse
-# from django.urls import reverse_lazy
-# import random
 from rest_framework import viewsets
 from product.serializer import ProductSerializer
+from rest_framework import status
 
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [rest_framework.permissions.IsAuthenticated]
+# ویو برای صفحه اصلی
+class HomePageView(APIView):
+    def get(self, request):
+        # گرفتن 8 تا از اخرین محصولات
+        latest_product = Product.objects.all()[:8]
 
+        serializer = ProductSerializer(latest_product, many=True)
+        response_data = {
+            "latest_product": serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+# نشان دادن اطلاعات محصول
+class ProductDetailView(APIView):
+    def get_queryset(self, slug):
+        try:
+            # نشان دادن محصول از طریق slug
+            return Product.objects.get(slug=slug)
+        except Product.DoesNotExist:
+            return Http404("Page Not Found")
+
+    # نشان دادن محصول
+    def get(self, request, slug):
+        # اسفاده از ویو get_queryset
+        product = self.get_queryset(slug)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+
+    # ادیت محصول
+    def put(self, request, slug):
+        product = self.get_queryset(slug)
+        serializer = ProductSerializer(product, data=request.data)
+        if serializer.is_valid():
+            # ادیت محصول در صورت معتبر بودن داده های ورودی
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # حذف محصول
+    def delete(self, request, slug):
+        product = self.get_queryset(slug)
+        # حذف محصول
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # class ProductDetailView(DetailView):
 #     model = Product
