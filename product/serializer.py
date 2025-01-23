@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from product.models import Product, Category, Color, Size
+from product.models import Product, Category, Color, Size, Comment
+from account.serializers import UserRegisterSerializer
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +27,17 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    product = serializers.SerializerMethodField()
+    class Meta:
+        model = Comment
+        fields = "__all__"
+        read_only_fields = ["user", "product"]
+
+    def get_user(self, obj):
+        return obj.user.phone
+
+    def get_product(self, obj):
+        return obj.product.name

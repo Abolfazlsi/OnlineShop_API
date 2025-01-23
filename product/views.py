@@ -1,13 +1,14 @@
 import rest_framework.permissions
+from django.db.transaction import commit
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from product.models import Product, Rating, Comment, Category, ContactUs
-from rest_framework import viewsets
-from product.serializer import ProductSerializer
+from rest_framework import viewsets, generics
+from product.serializer import ProductSerializer, CommentSerializer
 from rest_framework import status
-
-
+from rest_framework.permissions import IsAuthenticated
+from product.permissions import IsCommentOwnerOrReadOnly
 # ویو برای صفحه اصلی
 class HomePageView(APIView):
     def get(self, request):
@@ -52,6 +53,35 @@ class ProductDetailView(APIView):
         # حذف محصول
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentView(APIView):
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CreateCommentView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, slug):
+        serializer = CommentSerializer(data=request.data)
+        product = Product.objects.get(slug=slug)
+        if serializer.is_valid():
+            serializer.save(user=request.user, product=product)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    queryset = Comment.objects.all()
+
+
+class EditCommentView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
 
 # class ProductDetailView(DetailView):
 #     model = Product
