@@ -1,14 +1,18 @@
 import rest_framework.permissions
+from celery.backends.database import retry
 from django.db.transaction import commit
 from django.http import Http404
+from django.template.context_processors import request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from product.models import Product, Rating, Comment, Category, ContactUs
 from rest_framework import viewsets, generics
-from product.serializer import ProductSerializer, CommentSerializer
+from product.serializer import ProductSerializer, CommentSerializer, RatingSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from product.permissions import IsCommentOwnerOrReadOnly
+
+
 # ویو برای صفحه اصلی
 class HomePageView(APIView):
     def get(self, request):
@@ -20,6 +24,7 @@ class HomePageView(APIView):
             "latest_product": serializer.data,
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
 
 # نشان دادن اطلاعات محصول
 class ProductDetailView(APIView):
@@ -55,14 +60,16 @@ class ProductDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CommentView(APIView):
+class CommentListView(APIView):
     def get(self, request):
         comments = Comment.objects.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class CreateCommentView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, slug):
         serializer = CommentSerializer(data=request.data)
         product = Product.objects.get(slug=slug)
@@ -83,28 +90,42 @@ class EditCommentView(generics.UpdateAPIView):
     queryset = Comment.objects.all()
 
 
+class RatingListView(APIView):
+    def get(self, request):
+        ratings = Rating.objects.all()
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateRatingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        serializer = RatingSerializer(data=request.data)
+        product = Product.objects.get(slug=slug)
+
+        if serializer.is_valid():
+            try:
+                rating = Rating.objects.get(product=product, user=request.user)
+                rating.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Rating.DoesNotExist:
+                serializer.save(user=request.user, product=product)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 # class ProductDetailView(DetailView):
 #     model = Product
 #     template_name = "product/product_detail.html"
-#
-#     def post(self, request, slug):
-#         text = request.POST.get("text")
-#         product = get_object_or_404(Product, slug=slug)
-#         if request.user.is_authenticated:
-#             add_comment = Comment.objects.create(user=request.user, text=text, product=product)
-#             return JsonResponse({
-#                 "status": "success",
-#                 "comment_text": add_comment.text,
-#                 "user_username": add_comment.user.fullname if add_comment.user.fullname else add_comment.user.phone,
-#                 "created_at": add_comment.time_since_creation(),
-#                 'slug': product.slug
-#             })
 #
 #
 #     def get_related_products(self, product):
 #         categories = product.category.all()
 #
-#         related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug)[:12]
+#         related_products = Product.objects.filter(ategory__in=categories).exclude(slug=product.slug)[:12]
 #         return related_products
 #
 #     def get_context_data(self, **kwargs):
@@ -120,18 +141,6 @@ class EditCommentView(generics.UpdateAPIView):
 #                 context["is_rate"] = False
 #
 #         return context
-#
-#
-# class RatingsView(View):
-#     def get(self, request, slug):
-#         product = get_object_or_404(Product, slug=slug)
-#         try:
-#             rating = Rating.objects.get(product=product, user=request.user)
-#             rating.delete()
-#             return JsonResponse({"response": "on_rating"})
-#         except:
-#             Rating.objects.create(product=product, user=request.user)
-#             return JsonResponse({"response": "rating"})
 #
 #
 # class ProductsListView(ListView):

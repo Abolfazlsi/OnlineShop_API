@@ -7,9 +7,11 @@ app_name = "product"
 urlpatterns = [
     path('', views.HomePageView.as_view(), name='home'),
     path('product-detail/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
-    path('comments/', views.CommentView.as_view(), name='comments'),
+    path('comments/', views.CommentListView.as_view(), name='comments'),
     path('add-comment/<slug:slug>/', views.CreateCommentView.as_view(), name='add-comment'),
     path('delete-comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete-comment'),
     path('edit-comment/<int:pk>/', views.EditCommentView.as_view(), name='edit-comment'),
+    path('ratings/', views.RatingListView.as_view(), name='ratings'),
+    path('add-rating/<slug:slug>/', views.CreateRatingView.as_view(), name='ratings'),
 ]
 
