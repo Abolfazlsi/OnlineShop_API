@@ -3,25 +3,29 @@ from celery.backends.database import retry
 from django.db.transaction import commit
 from django.http import Http404
 from django.template.context_processors import request
+from django.db.models import Count
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from product.models import Product, Rating, Comment, Category, ContactUs
 from rest_framework import viewsets, generics
 from product.serializer import ProductSerializer, CommentSerializer, RatingSerializer
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from product.permissions import IsCommentOwnerOrReadOnly
-
-
+from rest_framework.exceptions import NotFound
+from django.shortcuts import get_object_or_404
 # ویو برای صفحه اصلی
 class HomePageView(APIView):
     def get(self, request):
         # گرفتن 8 تا از اخرین محصولات
         latest_product = Product.objects.all()[:8]
+        best_seller = Product.objects.annotate(rating_count=Count("ratings")).order_by('-rating_count')[:1]
+        latest_product_serializer = ProductSerializer(latest_product, many=True)
+        best_seller_serializer = ProductSerializer(best_seller, many=True)
 
-        serializer = ProductSerializer(latest_product, many=True)
         response_data = {
-            "latest_product": serializer.data,
+            "latest_products": latest_product_serializer.data,
+            "best_seller": best_seller_serializer.data,
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -33,31 +37,41 @@ class ProductDetailView(APIView):
             # نشان دادن محصول از طریق slug
             return Product.objects.get(slug=slug)
         except Product.DoesNotExist:
-            return Http404("Page Not Found")
+            return Response({"detail": "Product Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
     # نشان دادن محصول
     def get(self, request, slug):
         # اسفاده از ویو get_queryset
         product = self.get_queryset(slug)
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
+        categories = product.category.all()
+        related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug).prefetch_related(
+            'category')[:12:-1]
 
-    # ادیت محصول
-    def put(self, request, slug):
-        product = self.get_queryset(slug)
-        serializer = ProductSerializer(product, data=request.data)
-        if serializer.is_valid():
-            # ادیت محصول در صورت معتبر بودن داده های ورودی
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        product_serializer = ProductSerializer(product)
+        related_product_serializer = ProductSerializer(related_products, many=True)
 
-    # حذف محصول
-    def delete(self, request, slug):
-        product = self.get_queryset(slug)
-        # حذف محصول
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        response_data = {
+            "product": product_serializer.data,
+            "related_product": related_product_serializer.data,
+        }
+        return Response(response_data)
+
+
+class ProductEditView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ProductSerializer
+
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        return get_object_or_404(Product, slug=slug)
+
+class ProductDeleteView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ProductSerializer
+
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        return get_object_or_404(Product, slug=slug)
 
 
 class CommentListView(APIView):
@@ -114,8 +128,6 @@ class CreateRatingView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 # class ProductDetailView(DetailView):
 #     model = Product
