@@ -3,6 +3,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils import timezone
 from datetime import timedelta
 
+
 class UserManager(BaseUserManager):
     def create_user(self, phone, password=None):
         if not phone:
@@ -24,6 +25,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
+
 
 # مدل یوزر شخصی سازی شده
 class User(AbstractBaseUser):
@@ -56,16 +58,15 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
+
 # مدل otp برای ساختن کد ارسالی برای کاربر
 class Otp(models.Model):
     token = models.CharField(max_length=11, unique=True)
     phone = models.CharField(max_length=1, unique=True)
     code = models.SmallIntegerField()
     expire = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.token
-    def save(self, *args, **kwargs):
-        if not self.expire:
-            self.expire = timezone.now() + timedelta(minutes=1)
-        super().save(*args, **kwargs)
+

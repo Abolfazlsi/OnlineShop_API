@@ -14,6 +14,7 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = ['name']
 
+
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
@@ -24,16 +25,19 @@ class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=True, read_only=True)
     color = ColorSerializer(many=True, read_only=True)
     size = SizeSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = "__all__"
 
+
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     product = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = ["id", "user", "text", "product", "time_since_creation"]
         read_only_fields = ["user", "product"]
 
     def get_user(self, obj):
@@ -41,6 +45,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_product(self, obj):
         return obj.product.name
+
 
 class RatingSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()

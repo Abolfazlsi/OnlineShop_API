@@ -1,7 +1,8 @@
 from pathlib import Path
 from datetime import timedelta
 import os
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-#jc+4efu+(5x@jc2--@lgng3@=*q+69!*^c^-3rd6p4b!t5@u$'
@@ -10,7 +11,6 @@ SECRET_KEY = 'django-insecure-#jc+4efu+(5x@jc2--@lgng3@=*q+69!*^c^-3rd6p4b!t5@u$
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -59,18 +59,9 @@ TEMPLATES = [
     },
 ]
 
+DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
+
 WSGI_APPLICATION = 'core.wsgi.application'
-
-
-# Database
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 
 # Password validation
 
@@ -89,7 +80,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'
@@ -100,11 +90,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

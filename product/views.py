@@ -14,11 +14,14 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from product.permissions import IsCommentOwnerOrReadOnly
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
+
+
 # ویو برای صفحه اصلی
 class HomePageView(APIView):
     def get(self, request):
         # گرفتن 8 تا از اخرین محصولات
         latest_product = Product.objects.all()[:8]
+        # محصول با بیشترین امتیاز
         best_seller = Product.objects.annotate(rating_count=Count("ratings")).order_by('-rating_count')[:1]
         latest_product_serializer = ProductSerializer(latest_product, many=True)
         best_seller_serializer = ProductSerializer(best_seller, many=True)
@@ -44,6 +47,7 @@ class ProductDetailView(APIView):
         # اسفاده از ویو get_queryset
         product = self.get_queryset(slug)
         categories = product.category.all()
+        # نشان دادن 12 تا از محصولات هم دسته با محصول
         related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug).prefetch_related(
             'category')[:12:-1]
 
@@ -57,6 +61,7 @@ class ProductDetailView(APIView):
         return Response(response_data)
 
 
+# ادیت محصول
 class ProductEditView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ProductSerializer
@@ -65,6 +70,8 @@ class ProductEditView(generics.UpdateAPIView):
         slug = self.kwargs.get('slug')
         return get_object_or_404(Product, slug=slug)
 
+
+# حذف محصول
 class ProductDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ProductSerializer
@@ -74,6 +81,7 @@ class ProductDeleteView(generics.DestroyAPIView):
         return get_object_or_404(Product, slug=slug)
 
 
+# لیست کامنت ها
 class CommentListView(APIView):
     def get(self, request):
         comments = Comment.objects.all()
@@ -81,6 +89,7 @@ class CommentListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# اضافه کردن کامنت
 class CreateCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -93,17 +102,20 @@ class CreateCommentView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# حذف کامنت
 class DeleteCommentView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     queryset = Comment.objects.all()
 
 
+# ادیت کامنت
 class EditCommentView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
 
+# لیست امتیازات محصولات
 class RatingListView(APIView):
     def get(self, request):
         ratings = Rating.objects.all()
@@ -111,6 +123,7 @@ class RatingListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# دادن امتیاز به محصول
 class CreateRatingView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -129,32 +142,32 @@ class CreateRatingView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class ProductDetailView(DetailView):
-#     model = Product
-#     template_name = "product/product_detail.html"
-#
-#
-#     def get_related_products(self, product):
-#         categories = product.category.all()
-#
-#         related_products = Product.objects.filter(ategory__in=categories).exclude(slug=product.slug)[:12]
-#         return related_products
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         product = self.object
-#
-#         context['related_products'] = self.get_related_products(product)
-#
-#         if self.request.user.is_authenticated:
-#             if self.request.user.ratings.filter(product=self.object, user=self.request.user).exists():
-#                 context["is_rate"] = True
-#             else:
-#                 context["is_rate"] = False
-#
-#         return context
-#
-#
+
+class ProductListAPIView(APIView):
+    def get(self, request):
+        min_price = request.data.get("min_price")
+        max_price = request.data.get("max_price")
+        filter = request.data.get("filter")
+        colors = request.data.get("color")
+        sizes = request.GET.getlist("size")
+        products = Product.objects.all()
+
+        if min_price and max_price:
+            products = products.filter(price__gte=min_price, price__lte=max_price).distinct()
+
+        if filter == "cheapest":
+            products = products.order_by("price")
+        elif filter == "expensive":
+            products = products.order_by("-price")
+
+        if colors:
+            products = products.filter(color__name__in=colors).distinct()
+
+        if sizes:
+            products = products.filter(size__name__in=sizes).distinct()
+
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 # class ProductsListView(ListView):
 #     model = Product
 #     template_name = "product/products_list.html"

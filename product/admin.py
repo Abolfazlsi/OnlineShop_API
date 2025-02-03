@@ -23,7 +23,7 @@ class ColorAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("name", "price")
     search_fields = ("name",)
-    list_filter = ("price", "category")
+    list_filter = ("category",)
     # نشان ندادن فیلد slug در پنل ادمین محصول
     exclude = ("slug",)
 

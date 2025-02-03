@@ -12,6 +12,7 @@ from uuid import uuid4
 from random import randint
 from django.contrib.auth import login, logout
 
+
 # کلس برای لاگین یا رجیستر کردن کاربر
 class UserRegisterViewSet(viewsets.ViewSet):
     def create(self, request):
@@ -37,6 +38,7 @@ class UserRegisterViewSet(viewsets.ViewSet):
             return Response({"token": token}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # برای وریفای کردن کاربر
 class OtpVerifyViewSet(viewsets.ViewSet):
@@ -65,6 +67,7 @@ class OtpVerifyViewSet(viewsets.ViewSet):
 
         return Response({"Error": "Invalid token or code"}, status=status.HTTP_400_BAD_REQUEST)
 
+
 # خروج کاربر
 class LogoutView(APIView):
     # دسترسی کاربر در صورت لاکین بودن
@@ -83,7 +86,6 @@ class LogoutView(APIView):
                 outstanding_refresh_token = OutstandingToken.objects.get(token=refresh_token)
                 # بلاک کردن refresh token کاربر
                 BlacklistedToken.objects.create(token=outstanding_refresh_token)
-
 
             return Response(status=status.HTTP_204_NO_CONTENT)
 

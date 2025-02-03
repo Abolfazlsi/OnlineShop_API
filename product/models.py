@@ -57,6 +57,7 @@ class Product(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
+
 # مدل برای امتیاز دادن به محصول
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
@@ -103,6 +104,7 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ("-created_at",)
+
 
 # مدل برای تماش با مدیران فروشگاه
 class ContactUs(models.Model):
