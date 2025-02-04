@@ -6,8 +6,8 @@ services:
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
-      - static_volume:/app/static
-      - media_volume:/app/media
+      - static_volume:/app/public/static
+      - media_volume:/app/public/media
     ports:
       - "8000:8000"
     environment:
@@ -25,7 +25,17 @@ services:
     ports:
       - "5432:5432"
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/public/static
+      - media_volume:/app/public/media
+    depends_on:
+      - web
 volumes:
-  postgres_data:
   static_volume:
   media_volume:
+  postgres_data:

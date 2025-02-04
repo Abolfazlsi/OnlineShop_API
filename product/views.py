@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from product.permissions import IsCommentOwnerOrReadOnly
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
+from product.filter_prodcts import filter_product
 
 
 # ویو برای صفحه اصلی
@@ -145,67 +146,24 @@ class CreateRatingView(APIView):
 
 class ProductListAPIView(APIView):
     def get(self, request):
-        min_price = request.data.get("min_price")
-        max_price = request.data.get("max_price")
-        filter = request.data.get("filter")
-        colors = request.data.get("color")
-        sizes = request.GET.getlist("size")
-        products = Product.objects.all()
-
-        if min_price and max_price:
-            products = products.filter(price__gte=min_price, price__lte=max_price).distinct()
-
-        if filter == "cheapest":
-            products = products.order_by("price")
-        elif filter == "expensive":
-            products = products.order_by("-price")
-
-        if colors:
-            products = products.filter(color__name__in=colors).distinct()
-
-        if sizes:
-            products = products.filter(size__name__in=sizes).distinct()
-
+        products = filter_product(request)
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-# class ProductsListView(ListView):
-#     model = Product
-#     template_name = "product/products_list.html"
-#
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         request = self.request
-#         min_price = request.GET.get("min_price")
-#         max_price = request.GET.get("max_price")
-#         filter = request.GET.get("filter")
-#         colors = request.GET.getlist("color")
-#         sizes = request.GET.getlist("size")
-#         products = Product.objects.all()
-#         page_number = request.GET.get("page", 1)
-#
-#         if min_price and max_price:
-#             products = products.filter(price__gte=min_price, price__lte=max_price).distinct()
-#
-#         if filter == "cheapest":
-#             products = products.order_by("price")
-#         elif filter == "expensive":
-#             products = products.order_by("-price")
-#
-#         if colors:
-#             products = products.filter(color__name__in=colors).distinct()
-#
-#         if sizes:
-#             products = products.filter(size__name__in=sizes).distinct()
-#
-#         paginator = Paginator(products, 9)
-#         objects_list = paginator.get_page(page_number)
-#
-#         context = super(ProductsListView, self).get_context_data()
-#         context["product_list"] = objects_list
-#         context["selected_colors"] = colors
-#         context["selected_sizes"] = sizes
-#         return context
-#
-#
+
+
+class ProductSearchAPIView(APIView):
+    def get(self, request):
+        q = request.GET.get("q")
+
+        products = Product.objects.filter(name__icontains=q)
+
+        filtered_products = filter_product(request)
+
+        filtered_products = filtered_products.filter(slug__in=products.values_list('slug', flat=True)).distinct()
+
+        # سریالایز کردن محصولات
+        serializer = ProductSerializer(filtered_products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 # class SearchProductView(ListView):
 #     model = Product
 #     template_name = "product/products_list.html"
