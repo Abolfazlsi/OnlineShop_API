@@ -106,7 +106,7 @@ class Comment(models.Model):
         ordering = ("-created_at",)
 
 
-# مدل برای تماش با مدیران فروشگاه
+# مدل برای تماس با مدیران فروشگاه
 class ContactUs(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contact_us")
     email = models.EmailField()

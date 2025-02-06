@@ -19,7 +19,7 @@ services:
     environment:
       POSTGRES_DB: onlineshop_db
       POSTGRES_USER: onlineshop_user
-      POSTGRES_PASSWORD: abol
+      POSTGRES_PASSWORD: admin
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:

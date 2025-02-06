@@ -9,7 +9,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'onlineshop_db',
         'USER': 'onlineshop_user',
-        'PASSWORD': 'abol',
+        'PASSWORD': 'admin',
         'HOST': 'db',
         'PORT': '5432',
     }

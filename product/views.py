@@ -15,6 +15,8 @@ from product.permissions import IsCommentOwnerOrReadOnly
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from product.filter_prodcts import filter_product
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 
 # ویو برای صفحه اصلی
@@ -32,6 +34,27 @@ class HomePageView(APIView):
             "best_seller": best_seller_serializer.data,
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class ProductListAPIView(APIView, PageNumberPagination):
+    def get(self, request):
+        products = filter_product(request)
+        result = self.paginate_queryset(products, request, view=self)
+        serializer = ProductSerializer(result, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
+class ProductSearchAPIView(APIView, PageNumberPagination):
+    def get(self, request):
+        q = request.GET.get("q", "")
+
+        filtered_products = filter_product(request)
+        filtered_products = filtered_products.filter(name__icontains=q).distinct()
+
+        result = self.paginate_queryset(filtered_products, request, view=self)
+
+        serializer = ProductSerializer(result, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 # نشان دادن اطلاعات محصول
@@ -144,116 +167,18 @@ class CreateRatingView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProductListAPIView(APIView):
-    def get(self, request):
-        products = filter_product(request)
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class CategoryDetailsAPIView(APIView, PageNumberPagination):
+    def get(self, request, slug):
+        q = request.GET.get("q", "")
 
+        filtered_product = filter_product(request)
+        filtered_product = filtered_product.filter(Q(category__slug=slug) & Q(name__icontains=q))
 
-class ProductSearchAPIView(APIView):
-    def get(self, request):
-        q = request.GET.get("q")
+        result = self.paginate_queryset(filtered_product, request, view=self)
 
-        products = Product.objects.filter(name__icontains=q)
+        serializer = ProductSerializer(result, many=True)
+        return self.get_paginated_response(serializer.data)
 
-        filtered_products = filter_product(request)
-
-        filtered_products = filtered_products.filter(slug__in=products.values_list('slug', flat=True)).distinct()
-
-        # سریالایز کردن محصولات
-        serializer = ProductSerializer(filtered_products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-# class SearchProductView(ListView):
-#     model = Product
-#     template_name = "product/products_list.html"
-#
-#     def get_queryset(self):
-#         q = self.request.GET.get("q")
-#         queryset = Product.objects.filter(name__icontains=q) if q else Product.objects.all()
-#         return queryset
-#
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         request = self.request
-#         q = request.GET.get("q")
-#         products = Product.objects.filter(name__icontains=q) if q else Product.objects.all()
-#         page_number = request.GET.get("page")
-#
-#         min_price = request.GET.get("min_price")
-#         max_price = request.GET.get("max_price")
-#         filter = request.GET.get("filter")
-#         colors = request.GET.getlist("color")
-#         sizes = request.GET.getlist("size")
-#
-#         if min_price and max_price:
-#             products = products.filter(price__gte=min_price, price__lte=max_price).distinct()
-#
-#         if filter == "cheapest":
-#             products = products.order_by("price").distinct()
-#         elif filter == "expensive":
-#             products = products.order_by("-price").distinct()
-#
-#         if colors:
-#             products = products.filter(color__name__in=colors).distinct()
-#
-#         if sizes:
-#             products = products.filter(size__name__in=sizes).distinct()
-#
-#         paginator = Paginator(products, 9)
-#         objects_list = paginator.get_page(page_number)
-#
-#         context = super(SearchProductView, self).get_context_data()
-#         context["product_list"] = objects_list
-#         context["selected_colors"] = colors
-#         context["selected_sizes"] = sizes
-#         return context
-#
-#
-# class CategoryDetailView(ListView):
-#     model = Category
-#     template_name = "product/products_list.html"
-#
-#     def get_queryset(self):
-#         slug = self.kwargs.get("slug")
-#
-#         queryset = Product.objects.filter(category__slug=slug)
-#
-#         return queryset
-#
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         request = self.request
-#         slug = self.kwargs.get("slug")
-#         min_price = request.GET.get("min_price")
-#         max_price = request.GET.get("max_price")
-#         filter = request.GET.get("filter")
-#         colors = request.GET.getlist("color")
-#         sizes = request.GET.getlist("size")
-#         products = Product.objects.filter(category__slug=slug)
-#         page_number = request.GET.get("page")
-#
-#         if min_price and max_price:
-#             products = products.filter(price__gte=min_price, price__lte=max_price).distinct()
-#
-#         if filter == "cheapest":
-#             products = products.order_by("price")
-#         elif filter == "expensive":
-#             products = products.order_by("-price")
-#
-#         if colors:
-#             products = products.filter(color__name__in=colors).distinct()
-#
-#         if sizes:
-#             products = products.filter(size__name__in=sizes).distinct()
-#
-#         paginator = Paginator(products, 9)
-#         objects_list = paginator.get_page(page_number)
-#
-#         context = super(CategoryDetailView, self).get_context_data()
-#         context["product_list"] = objects_list
-#         context["selected_colors"] = colors
-#         context["selected_sizes"] = sizes
-#         return context
-#
 # class ContactUsView(CreateView):
 #     model = ContactUs
 #     form_class = ContactUsForm
