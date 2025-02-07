@@ -1,18 +1,13 @@
-import rest_framework.permissions
-from celery.backends.database import retry
-from django.db.transaction import commit
-from django.http import Http404
-from django.template.context_processors import request
 from django.db.models import Count
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from product.models import Product, Rating, Comment, Category, ContactUs
+from product.models import Product, Rating, Comment, ContactUs, Category
 from rest_framework import viewsets, generics
-from product.serializer import ProductSerializer, CommentSerializer, RatingSerializer
+from product.serializer import ProductSerializer, CommentSerializer, RatingSerializer, CategorySerializer, \
+    ContactUsSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from product.permissions import IsCommentOwnerOrReadOnly
-from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from product.filter_prodcts import filter_product
 from rest_framework.pagination import PageNumberPagination
@@ -20,7 +15,8 @@ from django.db.models import Q
 
 
 # ویو برای صفحه اصلی
-class HomePageView(APIView):
+# home page
+class HomePageAPIView(APIView):
     def get(self, request):
         # گرفتن 8 تا از اخرین محصولات
         latest_product = Product.objects.all()[:8]
@@ -36,14 +32,13 @@ class HomePageView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ProductListAPIView(APIView, PageNumberPagination):
-    def get(self, request):
-        products = filter_product(request)
-        result = self.paginate_queryset(products, request, view=self)
-        serializer = ProductSerializer(result, many=True)
-        return self.get_paginated_response(serializer.data)
+# products list
+class ProductListAPIView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
+# product search(found product by name)
 class ProductSearchAPIView(APIView, PageNumberPagination):
     def get(self, request):
         q = request.GET.get("q", "")
@@ -58,7 +53,8 @@ class ProductSearchAPIView(APIView, PageNumberPagination):
 
 
 # نشان دادن اطلاعات محصول
-class ProductDetailView(APIView):
+# product detail
+class ProductDetailAPIView(APIView):
     def get_queryset(self, slug):
         try:
             # نشان دادن محصول از طریق slug
@@ -72,6 +68,7 @@ class ProductDetailView(APIView):
         product = self.get_queryset(slug)
         categories = product.category.all()
         # نشان دادن 12 تا از محصولات هم دسته با محصول
+        # 12 related product
         related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug).prefetch_related(
             'category')[:12:-1]
 
@@ -86,35 +83,39 @@ class ProductDetailView(APIView):
 
 
 # ادیت محصول
+# product edit(just admin can edit it)
 class ProductEditView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ProductSerializer
 
+    # get product by slug for edit
     def get_object(self):
         slug = self.kwargs.get('slug')
         return get_object_or_404(Product, slug=slug)
 
 
 # حذف محصول
+# delete product(just admin can delete it)
 class ProductDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ProductSerializer
 
+    # get product by slug for delete
     def get_object(self):
         slug = self.kwargs.get('slug')
         return get_object_or_404(Product, slug=slug)
 
 
 # لیست کامنت ها
-class CommentListView(APIView):
-    def get(self, request):
-        comments = Comment.objects.all()
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# comments list
+class CommentListView(generics.ListAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
 
 # اضافه کردن کامنت
-class CreateCommentView(APIView):
+# add comment
+class CreateCommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slug):
@@ -127,12 +128,14 @@ class CreateCommentView(APIView):
 
 
 # حذف کامنت
+# delete comment(just owner can delete it)
 class DeleteCommentView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     queryset = Comment.objects.all()
 
 
 # ادیت کامنت
+# edit comment(just owner can edit it)
 class EditCommentView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     serializer_class = CommentSerializer
@@ -140,15 +143,15 @@ class EditCommentView(generics.UpdateAPIView):
 
 
 # لیست امتیازات محصولات
-class RatingListView(APIView):
-    def get(self, request):
-        ratings = Rating.objects.all()
-        serializer = RatingSerializer(ratings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# ratings list
+class RatingListView(generics.ListAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
 
 
 # دادن امتیاز به محصول
-class CreateRatingView(APIView):
+# add rating to product
+class CreateRatingAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slug):
@@ -157,16 +160,25 @@ class CreateRatingView(APIView):
 
         if serializer.is_valid():
             try:
+                # delete ratings if rating already exists
                 rating = Rating.objects.get(product=product, user=request.user)
                 rating.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             except Rating.DoesNotExist:
+                # add rating if raring does not exist
                 serializer.save(user=request.user, product=product)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# category list
+class CategoryListAPIView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+# show products that related by category
 class CategoryDetailsAPIView(APIView, PageNumberPagination):
     def get(self, request, slug):
         q = request.GET.get("q", "")
@@ -179,14 +191,20 @@ class CategoryDetailsAPIView(APIView, PageNumberPagination):
         serializer = ProductSerializer(result, many=True)
         return self.get_paginated_response(serializer.data)
 
-# class ContactUsView(CreateView):
-#     model = ContactUs
-#     form_class = ContactUsForm
-#     template_name = "product/contact_us.html"
-#     success_url = reverse_lazy("product:contact_us")
-#     def form_valid(self, form):
-#         instance = form.save(commit=False)
-#         instance.user = self.request.user
-#         instance.save()
-#         return super(ContactUsView, self).form_valid(form)
-#
+
+# list of people who send message to shop
+class ContactUsListView(generics.ListAPIView):
+    queryset = ContactUs.objects.all()
+    serializer_class = ContactUsSerializer
+
+
+# add contact us
+class CreateContactUsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ContactUsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

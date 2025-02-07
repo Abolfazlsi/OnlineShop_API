@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+
+# check user is owner or not
 class IsCommentOwnerOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):

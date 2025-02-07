@@ -9,4 +9,5 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('account/', include('account.urls')),
     path('product/', include('product.urls')),
+    path('cart/', include('cart.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

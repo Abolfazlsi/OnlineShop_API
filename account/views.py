@@ -1,6 +1,3 @@
-import rest_framework.permissions
-import rest_framework_simplejwt.authentication
-from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken, BlacklistedToken
@@ -10,10 +7,10 @@ from .models import User, Otp
 from .serializers import UserRegisterSerializer
 from uuid import uuid4
 from random import randint
-from django.contrib.auth import login, logout
 
 
 # کلس برای لاگین یا رجیستر کردن کاربر
+# login and register with opt system
 class UserRegisterViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = UserRegisterSerializer(data=request.data)
@@ -41,6 +38,7 @@ class UserRegisterViewSet(viewsets.ViewSet):
 
 
 # برای وریفای کردن کاربر
+# check otp
 class OtpVerifyViewSet(viewsets.ViewSet):
     def create(self, request):
         # گرفتن توکن و کد
@@ -69,6 +67,7 @@ class OtpVerifyViewSet(viewsets.ViewSet):
 
 
 # خروج کاربر
+# logout
 class LogoutView(APIView):
     # دسترسی کاربر در صورت لاکین بودن
     permission_classes = [IsAuthenticated]

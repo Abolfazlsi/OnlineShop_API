@@ -28,7 +28,8 @@ INSTALLED_APPS = [
 
     # my apps
     'account.apps.AccountConfig',
-    'product.apps.ProductConfig'
+    'product.apps.ProductConfig',
+    'cart.apps.CartConfig'
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,6 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

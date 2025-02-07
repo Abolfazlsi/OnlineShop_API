@@ -1,12 +1,14 @@
 from product.models import Product
 
 
+# filter product by (color, size, price, cheapest and the most expensive)
 def filter_product(request):
     min_price = request.GET.get("min_price")
     max_price = request.GET.get("max_price")
+    # filter product (cheapest adn the most expensive)
     filter = request.GET.get("filter")
-    colors = request.GET.getlist("color")  # استفاده از getlist برای دریافت چند رنگ
-    sizes = request.GET.getlist("size")  # استفاده از getlist برای دریافت چند اندازه
+    colors = request.GET.getlist("color")
+    sizes = request.GET.getlist("size")
     products = Product.objects.all()
 
     if min_price and max_price:
