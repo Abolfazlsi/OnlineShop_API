@@ -1,16 +1,18 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
-from django.views.generic import TemplateView, View, DetailView
+from django.shortcuts import get_object_or_404
 from product.models import Product
-from django.contrib.auth.mixins import LoginRequiredMixin
 from cart.cart_module import Cart
 from cart.models import DiscountCode, Order, OrderItem, UsedDiscountCode
-from django.conf import settings
-import json
-from django.http import JsonResponse, HttpResponseRedirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
+from cart.serializer import OrderSerializer, CartSerializer
+from product.permissions import IsOrderOwner
+from django.conf import settings
+from account.models import Address
+import requests
+import json
+from django.db import transaction
 
 
 # cart
@@ -50,18 +52,22 @@ class CartAddAPIView(APIView):
 
     def post(self, request, pk):
         product = get_object_or_404(Product, id=pk)
-        quantity = request.data.get("quantity")
-        color = request.data.get("color", "empty")
-        size = request.data.get("size", "empty")
+        serializer = CartSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        quantity = serializer.validated_data.get("quantity")
+        color = serializer.validated_data.get("color", "empty")
+        size = serializer.validated_data.get("size", "empty")
 
         if not quantity or int(quantity) <= 0:
             return Response(
                 {"detail": "Quantity must be greater than 0."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         # add product to cart if color and size were in product
-        if product.color.filter(name=color).exists() and product.size.filter(name=size).exists():
+        if (product.color.filter(name=color).exists() and product.size.filter(name=size).exists()) or (
+                color == "empty" or size == "empty"):
             cart = Cart(request)
             cart.add(product, quantity, color, size)
             return Response(
@@ -79,137 +85,179 @@ class CartAddAPIView(APIView):
 class CartDeleteAPIView(APIView):
     def delete(self, request, pk):
         cart = Cart(request)
-        cart.delete(pk)
-        return Response({"message": "cart deleted successfully"}, status=status.HTTP_200_OK)
 
-# class OrderDetailView(LoginRequiredMixin, DetailView):
-#     model = Order
-#     template_name = "cart/order_detail.html"
-#
-#
-# class OrderCreationView(LoginRequiredMixin, View):
-#     def get(self, request):
-#         cart = Cart(request)
-#         order = Order.objects.create(user=request.user, total=cart.final_total())
-#         for item in cart:
-#             OrderItem.objects.create(order=order, product=item["product"], quantity=item["quantity"], size=item["size"],
-#                                      color=item["color"], price=item["price"])
-#         cart.remove_cart()
-#
-#         return redirect("cart:order_detail", order.id)
-#
-#
-# class DiscountView(View):
-#     def post(self, request, pk):
-#         code = request.POST.get('discount')
-#         order = get_object_or_404(Order, id=pk)
-#         discount_code = get_object_or_404(DiscountCode, code=code)
-#         if UsedDiscountCode.objects.filter(user=request.user, discount_code=discount_code, order=order).exists():
-#             return redirect("cart:order_detail", order.id)
-#         if discount_code.quantity == 0:
-#             discount_code.delete()
-#             return redirect("cart:order_detail", order.id)
-#         order.total -= order.total * discount_code.discount / 100
-#         order.save()
-#         UsedDiscountCode.objects.create(user=request.user, discount_code=discount_code, order=order)
-#         discount_code.quantity -= 1
-#         discount_code.save()
-#
-#         return redirect("cart:order_detail", order.id)
-#
-#
-# if settings.SANDBOX:
-#     sandbox = 'sandbox'
-# else:
-#     sandbox = 'payment'
-#
-# ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/v4/payment/request.json"
-# ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
-# ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/v4/payment/verify.json"
-#
-# description = "نهایی کردن خرید شما از سایت ما"
-#
-# CallbackURL = 'http://127.0.0.1:8000/cart/verify/'
-#
-#
-# class SendRequestView(View):
-#     def post(self, request, pk):
-#         # بازیابی سفارش بر اساس شناسه و کاربر
-#         order = get_object_or_404(Order, id=pk, user=request.user)
-#
-#         # بازیابی آدرس از POST
-#         address = get_object_or_404(Address, id=request.POST.get("address"))
-#
-#         # تنظیم آدرس سفارش
-#         order.full_name = f"{address.fullname}"
-#         order.address = f"{address.address}"
-#         order.phone_number = f"{address.phone}"
-#         order.postal_code = f"{address.postal_code}"
-#         order.save()
-#
-#         # ذخیره شناسه سفارش در جلسه
-#         request.session["order_id"] = str(order.id)
-#
-#         # آماده‌سازی داده‌ها برای ارسال به API
-#         data = {
-#             "merchant_id": settings.MERCHANT,
-#             "amount": order.total,
-#             "description": description,
-#             "callback_url": CallbackURL,
-#         }
-#         data = json.dumps(data)
-#
-#         # تنظیم هدرها
-#         headers = {'content-type': 'application/json', 'content-length': str(len(data))}
-#
-#         # ارسال درخواست به API
-#         response = requests.post(ZP_API_REQUEST, data=data, headers=headers)
-#
-#         # بررسی پاسخ API
-#         if response.status_code == 200:
-#             response = response.json()
-#
-#             if response["data"]['code'] == 100:
-#                 url = f"{ZP_API_STARTPAY}{response['data']['authority']}"
-#                 return redirect(url)
-#             else:
-#                 return HttpResponse(str(response['errors']))
-#         else:
-#             return render(request, "cart/Buy_Error.html", {})
-#
-#
-#
-# class VerifyView(View):
-#     def get(self, request):
-#         status = request.GET.get('Status')
-#         authority = request.GET.get('Authority')
-#         order = Order.objects.get(id=int(request.session['order_id']))
-#
-#         if status == "OK":
-#
-#
-#             data = {
-#                 "merchant_id": settings.MERCHANT,
-#                 "amount": order.total,
-#                 "authority": authority
-#             }
-#             data = json.dumps(data)
-#
-#             headers = {'content-type': 'application/json', 'Accept': 'application/json'}
-#
-#             response = requests.post(ZP_API_VERIFY, data=data, headers=headers)
-#
-#             if response.status_code == 200:
-#                 response = response.json()
-#                 if response['data']['code'] == 100:
-#                     order.is_paid = True
-#                     order.save()
-#                     return render(request, "cart/successfully_pay.html", {"order": order})
-#                 elif response['data']['code'] == 101:
-#                     return render(request, "cart/pay_again.html", {})
-#                 else:
-#                     return render(request, "cart/unsuccessful_pay.html", {})
-#             else:
-#                 return render(request, "cart/unsuccessful_pay.html", {})
-#         else:
-#             return render(request, "cart/unsuccessful_pay.html", {})
+        if not cart.item_exists(pk):
+            return Response({"message": "product not found in cart"}, status=status.HTTP_404_NOT_FOUND)
+
+        cart.delete(pk)
+        return Response({"message": "product removed from cart"}, status=status.HTTP_200_OK)
+
+
+# order details
+class OrderDetailView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated, IsOrderOwner]
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+# add product from cart to orders
+class OrderCreationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        cart = Cart(request)
+        if not cart:
+            return Response({"message": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                order = Order.objects.create(user=request.user, total=cart.final_total())
+                for item in cart:
+                    OrderItem.objects.create(order=order, product=item["product"], quantity=item["quantity"],
+                                             size=item["size"],
+                                             color=item["color"], price=item["price"])
+                cart.remove_cart()
+            serializer = OrderSerializer(order)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# discount code
+class DisCountCodeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        code = request.data.get("code")
+        order = get_object_or_404(Order, id=pk)
+
+        try:
+            discount_code = DiscountCode.objects.get(code=code)
+        except DiscountCode.DoesNotExist:
+            return Response({"message": "invalid  discount code"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if UsedDiscountCode.objects.filter(user=request.user, discount_code=discount_code).exists():
+            return Response({"message": "you have already use this discount code"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if discount_code.quantity <= 0:
+            discount_code.delete()
+            return Response({"message": "this discount code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if order.is_paid:
+            return Response({"message": "you have already paid the amount"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                discount_code.quantity -= 1
+                discount_code.save()
+
+                UsedDiscountCode.objects.create(user=request.user, discount_code=discount_code, order=order)
+
+                order.total -= (order.total * discount_code.discount) / 100
+                order.save()
+
+                serializer = OrderSerializer(order)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# payment gateway
+if settings.SANDBOX:
+    sandbox = 'sandbox'
+else:
+    sandbox = 'payment'
+
+ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/v4/payment/request.json"
+ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
+ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/v4/payment/verify.json"
+
+description = "نهایی کردن خرید شما از سایت ما"
+
+CallbackURL = 'http://127.0.0.1:8000/cart/verify/'
+
+
+
+class SendRequestAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+
+        address = get_object_or_404(Address, id=request.data.get("address"))
+
+        order.full_name = f"{address.fullname}"
+        order.address = f"{address.address}"
+        order.phone_number = f"{address.phone}"
+        order.postal_code = f"{address.postal_code}"
+        order.save()
+
+        request.session["order_id"] = str(order.id)
+
+        data = {
+            "merchant_id": settings.MERCHANT,
+            "amount": order.total,
+            "description": description,
+            "callback_url": CallbackURL,
+        }
+        data = json.dumps(data)
+
+        headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+
+        response = requests.post(ZP_API_REQUEST, data=data, headers=headers)
+
+        if response.status_code == 200:
+            response = response.json()
+
+            if response["data"]['code'] == 100:
+                url = f"{ZP_API_STARTPAY}{response['data']['authority']}"
+                return Response({"redirect_url": url}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": response["errors"]}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "something  were wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VerifyAPIView(APIView):
+
+    def get(self, request):
+        payment_status = request.query_params.get('Status')
+        authority = request.query_params.get('Authority')
+
+        order_id = request.session.get('order_id')
+        if not order_id:
+            return Response({"error": "order bot found"})
+
+        order = get_object_or_404(Order, id=int(order_id))
+
+        if payment_status == "OK":
+            data = {
+                "merchant_id": settings.MERCHANT,
+                "amount": order.total,
+                "authority": authority
+            }
+            data = json.dumps(data)
+
+            headers = {'content-type': 'application/json', 'Accept': 'application/json'}
+
+            response = requests.post(ZP_API_VERIFY, data=data, headers=headers)
+
+            if response.status_code == 200:
+                response_data = response.json()
+
+                if response_data['data']['code'] == 100:
+                    order.is_paid = True
+                    order.save()
+                    return Response({"message": "payment was successfully", "order_id": order.id})
+
+                elif response_data['data']['code'] == 101:
+                    return Response({"message": "payment has already been made"}, status=status.HTTP_200_OK)
+
+                else:
+                    return Response({"error": "payment failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                return Response({"error": "error connecting to the payment gateway"},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        else:
+            return Response({"error": "payment canceled by user"}, status=status.HTTP_200_OK)

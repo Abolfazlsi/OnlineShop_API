@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.utils import timezone
-from datetime import timedelta
 
 
 class UserManager(BaseUserManager):
@@ -70,3 +68,14 @@ class Otp(models.Model):
     def __str__(self):
         return self.token
 
+
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
+    fullname = models.CharField(max_length=200)
+    address = models.TextField()
+    email = models.EmailField()
+    phone = models.CharField(max_length=11)
+    postal_code = models.CharField(max_length=11)
+
+    def __str__(self):
+        return f"{self.user.phone}"

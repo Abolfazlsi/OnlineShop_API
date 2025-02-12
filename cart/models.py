@@ -33,7 +33,7 @@ class OrderItem(models.Model):
 
 
 class DiscountCode(models.Model):
-    code = models.CharField(max_length=20)
+    code = models.CharField(max_length=20, unique=True)
     discount = models.SmallIntegerField(default=0)
     quantity = models.IntegerField(default=1)
 
