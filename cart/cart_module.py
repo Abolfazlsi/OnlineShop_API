@@ -49,6 +49,9 @@ class Cart:
     def get_product_count(self):
         return len(self.cart)
 
+    def item_exists(self, id):
+        return str(id) in self.cart
+
     # delete product from cart
     def delete(self, id):
         if id in self.cart:

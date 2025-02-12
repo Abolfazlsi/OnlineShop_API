@@ -102,6 +102,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "account.User"
 
+MERCHANT = "9bb72628-0d73-4134-bcef-f8946dcc3e5f"
+
+SANDBOX = True
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",

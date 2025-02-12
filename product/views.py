@@ -14,13 +14,10 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 
 
-# ویو برای صفحه اصلی
 # home page
 class HomePageAPIView(APIView):
     def get(self, request):
-        # گرفتن 8 تا از اخرین محصولات
         latest_product = Product.objects.all()[:8]
-        # محصول با بیشترین امتیاز
         best_seller = Product.objects.annotate(rating_count=Count("ratings")).order_by('-rating_count')[:1]
         latest_product_serializer = ProductSerializer(latest_product, many=True)
         best_seller_serializer = ProductSerializer(best_seller, many=True)
@@ -52,22 +49,18 @@ class ProductSearchAPIView(APIView, PageNumberPagination):
         return self.get_paginated_response(serializer.data)
 
 
-# نشان دادن اطلاعات محصول
 # product detail
 class ProductDetailAPIView(APIView):
     def get_queryset(self, slug):
         try:
-            # نشان دادن محصول از طریق slug
             return Product.objects.get(slug=slug)
         except Product.DoesNotExist:
             return Response({"detail": "Product Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # نشان دادن محصول
     def get(self, request, slug):
         # اسفاده از ویو get_queryset
         product = self.get_queryset(slug)
         categories = product.category.all()
-        # نشان دادن 12 تا از محصولات هم دسته با محصول
         # 12 related product
         related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug).prefetch_related(
             'category')[:12:-1]
@@ -82,7 +75,6 @@ class ProductDetailAPIView(APIView):
         return Response(response_data)
 
 
-# ادیت محصول
 # product edit(just admin can edit it)
 class ProductEditView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -94,7 +86,6 @@ class ProductEditView(generics.UpdateAPIView):
         return get_object_or_404(Product, slug=slug)
 
 
-# حذف محصول
 # delete product(just admin can delete it)
 class ProductDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -106,14 +97,12 @@ class ProductDeleteView(generics.DestroyAPIView):
         return get_object_or_404(Product, slug=slug)
 
 
-# لیست کامنت ها
 # comments list
 class CommentListView(generics.ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
 
-# اضافه کردن کامنت
 # add comment
 class CreateCommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -127,14 +116,12 @@ class CreateCommentAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# حذف کامنت
 # delete comment(just owner can delete it)
 class DeleteCommentView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     queryset = Comment.objects.all()
 
 
-# ادیت کامنت
 # edit comment(just owner can edit it)
 class EditCommentView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
@@ -142,14 +129,12 @@ class EditCommentView(generics.UpdateAPIView):
     queryset = Comment.objects.all()
 
 
-# لیست امتیازات محصولات
 # ratings list
 class RatingListView(generics.ListAPIView):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
 
-# دادن امتیاز به محصول
 # add rating to product
 class CreateRatingAPIView(APIView):
     permission_classes = [IsAuthenticated]
