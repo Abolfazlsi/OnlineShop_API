@@ -36,10 +36,25 @@
 
 ## 🧩 installation
 
-  1. Clone Repositorie
+1. Clone Repository
 
-    ```bash
-    git clone https://github.com/Abolfazlsi/OnlineShop_API.git
-    cd OnlineShop_API
-    ```
+  ```
+  git clone https://github.com/Abolfazlsi/OnlineShop_API.git
+
+  cd OnlineShop_API
+  ```
+
+2. Install Virtualenv
+
+   ```
+   pip install virtualenv
+
+   virtualenv venv
+   ```
+
+- Windows
+  
+
+
+
 
