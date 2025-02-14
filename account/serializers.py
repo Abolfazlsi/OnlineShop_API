@@ -9,10 +9,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Address
         fields = "__all__"
         read_only_fields = ["user"]
+
+    def get_user(self, obj):
+        return obj.user.phone
 
 
 class UserSerializer(serializers.ModelSerializer):

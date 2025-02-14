@@ -51,19 +51,13 @@ class ProductSearchAPIView(APIView, PageNumberPagination):
 
 # product detail
 class ProductDetailAPIView(APIView):
-    def get_queryset(self, slug):
-        try:
-            return Product.objects.get(slug=slug)
-        except Product.DoesNotExist:
-            return Response({"detail": "Product Not Found"}, status=status.HTTP_404_NOT_FOUND)
-
     def get(self, request, slug):
         # اسفاده از ویو get_queryset
-        product = self.get_queryset(slug)
+        product = get_object_or_404(Product, slug=slug)
         categories = product.category.all()
         # 12 related product
         related_products = Product.objects.filter(category__in=categories).exclude(slug=product.slug).prefetch_related(
-            'category')[:12:-1]
+            'category')[:12]
 
         product_serializer = ProductSerializer(product)
         related_product_serializer = ProductSerializer(related_products, many=True)
@@ -72,7 +66,7 @@ class ProductDetailAPIView(APIView):
             "product": product_serializer.data,
             "related_product": related_product_serializer.data,
         }
-        return Response(response_data)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 # product edit(just admin can edit it)
