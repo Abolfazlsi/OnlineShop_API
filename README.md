@@ -68,7 +68,12 @@
   ```
   $ source venv/bin/activate
   ```
-  
+
+3. Install Packages
+
+   ```
+   $ pip install -r requirements.txt
+   ```
 
   
   
