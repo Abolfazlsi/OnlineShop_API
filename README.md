@@ -55,19 +55,19 @@
 
  - Windows
   
-  ```
-  > cd venv/Script/
+   ```
+   > cd venv/Script/
 
-  > activate
+   > activate
 
-  > cd ../..
-  ```
+   > cd ../..
+   ```
 
 - Linux
 
-  ```
-  $ source venv/bin/activate
-  ```
+   ```
+   $ source venv/bin/activate
+   ```
 
 3. 💠 Install Packages
 
