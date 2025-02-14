@@ -53,7 +53,7 @@
    $ virtualenv venv
    ```
 
- - Windows
+ ### Windows
   
    ```
    > cd venv/Script/
@@ -63,7 +63,7 @@
    > cd ../..
    ```
 
-- Linux
+### Linux
 
    ```
    $ source venv/bin/activate
