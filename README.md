@@ -76,10 +76,6 @@
    $ pip install -r requirements.txt
    ```
 
-4. 💠 Install Docker (optional)
-
-   Install Docker from here [Docker](https://www.docker.com/)
-
 ## 🪄 Use
 
 ### In terminal
@@ -89,15 +85,6 @@
    ```
 
 - you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**
-
-
-### for run with Docker
-
-   ```
-   $ docker compose up
-   ```
-
-- then go to this url `http://127.0.0.1`
 
 
 
