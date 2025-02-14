@@ -11,6 +11,7 @@
 - [Docker](https://www.docker.com/) ➡️ Docker is an open platform for developing, shipping, and running applications.
 - [Nginx](https://nginx.org/) ➡️ NGINX is open-source web server software used for reverse proxy, load balancing, and caching.
 - [Celery](https://docs.celeryq.dev/en/stable/) ➡️ Celery is an open source asynchronous task queue or job queue which is based on distributed message passing.
+- [Swagger](https://swagger.io/) ➡️ Swagger API is a set of open-source tools built to help programmers develop, design, document, and use REST APIs.
 
 ---
 
@@ -84,10 +85,19 @@
 ### In terminal
 
    ```
-   python manage.py runserver
+   $ python manage.py runserver
    ```
 
 - you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**
+
+
+### for run with Docker
+
+   ```
+   $ docker compose up
+   ```
+
+- then go to this url `http://127.0.0.1`
 
 
 
