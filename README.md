@@ -37,7 +37,7 @@
 ## 🧩 installation
 
 
-1. Clone Repository
+1. 💠 Clone Repository
 
   ```
   $ git clone https://github.com/Abolfazlsi/OnlineShop_API.git
@@ -45,7 +45,7 @@
   $ cd OnlineShop_API
   ```
 
-2. Install Virtualenv
+2. 💠 Install Virtualenv
 
    ```
    $ pip install virtualenv
@@ -53,7 +53,7 @@
    $ virtualenv venv
    ```
 
-- Windows
+ Windows
   
   ```
   > cd venv/Script/
@@ -69,7 +69,7 @@
   $ source venv/bin/activate
   ```
 
-3. Install Packages
+3. 💠 Install Packages
 
    ```
    $ pip install -r requirements.txt
