@@ -6,7 +6,7 @@
 
 ## 🌐 Technologies
 
-- [Django](https://www.djangoproject.com/)
+- **[Django]**(https://www.djangoproject.com/)
 - [DRF](https://www.django-rest-framework.org/)
 - [Docker](https://www.docker.com/)
 - [Nginx](https://nginx.org/)
