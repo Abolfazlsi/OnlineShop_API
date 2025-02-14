@@ -87,9 +87,7 @@
    python manage.py runserver
    ```
 
-- you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a Browser.
-
-- for test this and use this project you can use **Postman** or **HTTPie** apps.
+- you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**
 
 
 
