@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_spectacular',
 
     # my apps
     'account.apps.AccountConfig',
@@ -109,7 +110,8 @@ SANDBOX = True
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 12
+    "PAGE_SIZE": 12,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -117,7 +119,14 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Online Shop API',
+    'DESCRIPTION': 'Online Shop API with full facilities',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+}
+
 # settings.py
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # آدرس Redis
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE = 'UTC'
