@@ -39,11 +39,11 @@
 
 1. 💠 Clone Repository
 
-  ```
-  $ git clone https://github.com/Abolfazlsi/OnlineShop_API.git
+   ```
+   $ git clone https://github.com/Abolfazlsi/OnlineShop_API.git
 
-  $ cd OnlineShop_API
-  ```
+   $ cd OnlineShop_API
+   ```
 
 2. 💠 Install Virtualenv
 
@@ -53,7 +53,7 @@
    $ virtualenv venv
    ```
 
- Windows
+ - Windows
   
   ```
   > cd venv/Script/
