@@ -86,6 +86,11 @@
 
 - you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**
 
+---
+
+- Github: [Abolfazl Shjaei](https://github.com/Abolfazlsi)
+- Linkedin: [Abolfazl Shojaei](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
+
 
 
 
