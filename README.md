@@ -12,17 +12,17 @@
 - 💠 [Nginx](https://nginx.org/)
 - 💠 [Celery](https://docs.celeryq.dev/en/stable/)
 
-  ## 🚀 Featuresu
+## 🚀 Featuresu
 
-  - **OTP Authentication**
-  - **Cart**
-  - **Discount code**
-  - **Payment gateaway**
-  - **Filter products**
-  - **Search products**
-  - **Comment and Rating(Like)**
+- **OTP Authentication**
+- **Cart**
+- **Discount code**
+- **Payment gateaway**
+- **Filter products**
+- **Search products**
+- **Comment and Rating(Like)**
 
-    ## 🗄️ Database
+## 🗄️ Database
 
-    - **SQLite(Development mode)**
-    - **Postgresql(Production Mode)**
+- **SQLite(Development mode)**
+- **Postgresql(Production Mode)**
