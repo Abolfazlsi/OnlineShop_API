@@ -31,3 +31,14 @@
 
 - **SQLite(Development mode)**
 - **Postgresql(Production Mode)**
+
+---
+
+## 🧩 installation
+
+1.Clone Repositorie
+
+```
+git clone https://github.com/Abolfazlsi/OnlineShop_API.git
+```
+
