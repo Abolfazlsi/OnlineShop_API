@@ -6,15 +6,16 @@
 
 ## 🌐 Technologies
 
-- 💠 [Django](https://www.djangoproject.com/)
+- 💠 [Django](https://www.djangoproject.com/):Django is a Python framework that makes it easier to create web sites using Python.
 - 💠 [DRF](https://www.django-rest-framework.org/)
 - 💠 [Docker](https://www.docker.com/)
 - 💠 [Nginx](https://nginx.org/)
 - 💠 [Celery](https://docs.celeryq.dev/en/stable/)
 
-## 🚀 Featuresu
+## 🚀 Features
 
 - **OTP Authentication**
+- **JWT Authentication**
 - **Cart**
 - **Discount code**
 - **Payment gateaway**
