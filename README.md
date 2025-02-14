@@ -77,7 +77,15 @@
 
 4. 💠 Install Docker (optional)
 
-   Install Docker from here[Docker](https://www.docker.com/)
+   Install Docker from here [Docker](https://www.docker.com/)
+
+## 🪄 Use
+
+### In terminal
+
+   ```
+   python manage.py runserver
+   ```
 
 
 
