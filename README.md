@@ -38,7 +38,7 @@
 
 1. Clone Repositorie
 
-```
+```bash
 git clone https://github.com/Abolfazlsi/OnlineShop_API.git
 ```
 
