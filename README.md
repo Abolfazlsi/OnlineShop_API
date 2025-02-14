@@ -36,7 +36,7 @@
 
 ## 🧩 installation
 
-1.Clone Repositorie
+1. Clone Repositorie
 
 ```
 git clone https://github.com/Abolfazlsi/OnlineShop_API.git
