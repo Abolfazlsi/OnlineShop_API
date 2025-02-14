@@ -75,6 +75,12 @@
    $ pip install -r requirements.txt
    ```
 
+4. 💠 Install Docker (optional)
+
+   Install Docker from here[Docker](https://www.docker.com/)
+
+
+
   
   
 
