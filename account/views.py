@@ -7,25 +7,31 @@ from .models import User, Otp, Address
 from .serializers import UserRegisterSerializer, UserSerializer, AddressSerializer
 from uuid import uuid4
 from random import randint
+from account.tasks import delete_otp
+from product.permissions import IsCommentOwnerOrReadOnly
+import re
 
 
 # login and register with opt system
 class UserRegisterViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = UserRegisterSerializer(data=request.data)
+        phone = request.data['phone']
 
-        if serializer.is_valid() or 'phone' in request.data:
-            phone = request.data['phone']
+        if serializer.is_valid() or User.objects.filter(phone=phone).exists():
 
-            if len(phone) < 11 or len(phone) > 12:
-                return Response({"message": "phone number is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+            if not re.match(r'^\d{11,12}$', phone):
+                return Response({"message": "Phone number is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
             code = randint(1000, 9999)
 
             token = str(uuid4())
 
-            Otp.objects.update_or_create(phone=phone, defaults={'code': code, 'token': token})
+            otp = Otp.objects.create(phone=phone, code=code, token=token)
 
             print(code)
+
+            # delete_otp.apply_async(args=[otp.id], countdown=60)
+
             return Response({"token": token}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -97,6 +103,12 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AddressListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
+    queryset = Address.objects.all()
+
+
 # add address
 class AddAddressAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -107,3 +119,14 @@ class AddAddressAPIView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditAddressView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    serializer_class = AddressSerializer
+    queryset = Address.objects.all()
+
+
+class DeleteAddressView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    queryset = Address.objects.all()

@@ -26,6 +26,9 @@ urlpatterns = [
     path('user-profile/', views.UserProfileView.as_view(), name='user_profile'),
 
     # address's url
+    path('addresses-list/', views.AddressListView.as_view(), name='address_list'),
     path('add-address/', views.AddAddressAPIView.as_view(), name='add_address'),
+    path('edit-address/<int:pk>/', views.EditAddressView.as_view(), name='edit_address'),
+    path('delete-address/<int:pk>/', views.DeleteAddressView.as_view(), name='delete_address'),
 
 ]
