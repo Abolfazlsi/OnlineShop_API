@@ -61,7 +61,7 @@
 
    > activate
 
-   > cd ../..
+   > cd ../.. (Back to OnlineShop_API folder)   
    ```
 
 - Linux
