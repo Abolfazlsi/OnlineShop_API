@@ -76,6 +76,8 @@
    $ pip install -r requirements.txt
    ```
 
+---
+
 ## 🪄 Use
 
 ### In terminal
@@ -84,7 +86,9 @@
    $ python manage.py runserver
    ```
 
-- you will see this url `http://127.0.0.1:8000/` ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**
+- you will see this url **`http://127.0.0.1:8000/`** ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**.
+
+- Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for see all of the urls.
 
 ---
 
