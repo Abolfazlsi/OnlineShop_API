@@ -16,7 +16,7 @@ import re
 class UserRegisterViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = UserRegisterSerializer(data=request.data)
-        phone = request.data['phone']
+        phone = request.data.get("phone")
 
         if serializer.is_valid() or User.objects.filter(phone=phone).exists():
 
@@ -28,7 +28,7 @@ class UserRegisterViewSet(viewsets.ViewSet):
 
             otp = Otp.objects.create(phone=phone, code=code, token=token)
 
-            print(code)
+            print(code)  # for test
 
             # delete_otp.apply_async(args=[otp.id], countdown=60)
 
@@ -103,6 +103,7 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# addresses list
 class AddressListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AddressSerializer
@@ -121,12 +122,14 @@ class AddAddressAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# edit address(just owner can edit it)
 class EditAddressView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     serializer_class = AddressSerializer
     queryset = Address.objects.all()
 
 
+# delete address(just owner can delete it)
 class DeleteAddressView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
     queryset = Address.objects.all()
