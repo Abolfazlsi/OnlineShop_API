@@ -80,7 +80,8 @@
 
 ## 🪄 Use
 
-### In terminal
+
+1. 💠 In terminal
 
    ```
    $ python manage.py runserver
