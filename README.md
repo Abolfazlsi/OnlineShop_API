@@ -76,7 +76,7 @@
    $ pip install -r requirements.txt
    ```
 
-4. 💠 Migrtae
+4. 💠 Migrate
    ```
    $ python manage.py migrate
    ```
@@ -85,8 +85,13 @@
 
 ## 🪄 Use
 
+1. 💠 create super user (you can enter the admin panel)
+    ```
+   $ python manage.py createsuperuser
+   ```
+   - set phone number and password for yourself.
 
-1. 💠 In terminal
+3. 💠 Run Project
 
    ```
    $ python manage.py runserver
@@ -95,6 +100,8 @@
 - you will see this url **`http://127.0.0.1:8000/`** ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**.
 
 - Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for see all of the urls.
+
+- you can go to this url **`http://127.0.0.1:8000/admin/`** to enter the admin panel.(enter the phone and password you set in the previous step)
 
 ---
 
