@@ -105,7 +105,7 @@
 
 ---
 
-## Social Networks 🤝
+## Socials🤝
 
 - Github: [Abolfazl Shjaei](https://github.com/Abolfazlsi)
   
