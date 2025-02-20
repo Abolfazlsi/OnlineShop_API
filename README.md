@@ -76,6 +76,11 @@
    $ pip install -r requirements.txt
    ```
 
+4. 💠 Migrtae
+   ```
+   $ python manage.py migrate
+   ```
+
 ---
 
 ## 🪄 Use
