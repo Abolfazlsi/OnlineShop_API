@@ -109,7 +109,7 @@
 
 - Github: [![github](https://img.icons8.com/?size=40&id=Mhl1TfJLdkh5&format=png&color=000000)](https://github.com/Abolfazlsi)
   
-- Linkedin: [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
+- Linkedin: [![LinkedIn](https://img.icons8.com/?size=40&id=13930&format=png&color=000000)](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
 
 
 
