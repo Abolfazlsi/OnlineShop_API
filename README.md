@@ -107,7 +107,7 @@
 
 ## Socials🤝
 
-- Github: [Abolfazl Shjaei](https://github.com/Abolfazlsi)
+- Github: [![github](https://img.icons8.com/?size=100&id=62856&format=png&color=000000)]
   
 - Linkedin: [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
 
