@@ -76,12 +76,22 @@
    $ pip install -r requirements.txt
    ```
 
+4. 💠 Migrate
+   ```
+   $ python manage.py migrate
+   ```
+
 ---
 
 ## 🪄 Use
 
+1. 💠 create super user (you can enter the admin panel)
+    ```
+   $ python manage.py createsuperuser
+   ```
+   - set phone number and password for yourself.
 
-1. 💠 In terminal
+3. 💠 Run Project
 
    ```
    $ python manage.py runserver
@@ -91,13 +101,15 @@
 
 - Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for see all of the urls.
 
+- you can go to this url **`http://127.0.0.1:8000/admin/`** to enter the admin panel.(enter the phone and password you set in the previous step)
+
 ---
 
-## Social Networks 🤝
+## Socials🤝
 
-- Github: [Abolfazl Shjaei](https://github.com/Abolfazlsi)
+- Github: [![github](https://img.icons8.com/?size=40&id=Mhl1TfJLdkh5&format=png&color=000000)](https://github.com/Abolfazlsi)
   
-- Linkedin: [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
+- Linkedin: [![LinkedIn](https://img.icons8.com/?size=40&id=13930&format=png&color=000000)](https://www.linkedin.com/in/abolfazl-shojaei-21101b314/)
 
 
 
