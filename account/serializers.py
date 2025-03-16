@@ -26,3 +26,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["fullname", "email", "phone", "addresses"]
+
+    def update(self, instance, validated_data):
+
+        addresses_data = validated_data.pop('addresses', None)
+
+        instance.fullname = validated_data.get('fullname', instance.fullname)
+        instance.email = validated_data.get('email', instance.email)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.save()
+
+        if addresses_data is not None:
+
+            instance.addresses.all().delete()
+
+            for address_data in addresses_data:
+                Address.objects.create(user=instance, **address_data)
+
+        return instance
