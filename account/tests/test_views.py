@@ -297,7 +297,6 @@ class TestAddAddressAPIView(APITestCase):
             "postal_code": "123465123"
         }
         response = self.client.post(self.url, data, format="json")
-        print(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Address.objects.all().count(), 0)
 
