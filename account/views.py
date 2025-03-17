@@ -8,7 +8,7 @@ from .serializers import UserRegisterSerializer, UserSerializer, AddressSerializ
 from uuid import uuid4
 from random import randint
 from account.tasks import delete_otp
-from product.permissions import IsCommentOwnerOrReadOnly
+from product.permissions import IsOwnerOrReadOnly
 import re
 
 
@@ -19,9 +19,6 @@ class UserRegisterViewSet(viewsets.ViewSet):
         phone = request.data.get("phone")
 
         if serializer.is_valid() or User.objects.filter(phone=phone).exists():
-
-            if not re.match(r'^\d{11,12}$', phone):
-                return Response({"message": "Phone number is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
             code = randint(1000, 9999)
 
             token = str(uuid4())
@@ -124,12 +121,12 @@ class AddAddressAPIView(APIView):
 
 # edit address(just owner can edit it)
 class EditAddressView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     serializer_class = AddressSerializer
     queryset = Address.objects.all()
 
 
 # delete address(just owner can delete it)
 class DeleteAddressView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Address.objects.all()

@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from .models import User, Otp, Address
+from account.models import User, Address
+import re
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['phone']
+
+    def validate_phone(self, value):
+        if not re.match(r'^\d{11,12}$', value):
+            raise serializers.ValidationError("Phone number is incorrect")
+        return value
 
 
 class AddressSerializer(serializers.ModelSerializer):

@@ -7,7 +7,7 @@ from product.serializer import ProductSerializer, CommentSerializer, RatingSeria
     ContactUsSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from product.permissions import IsCommentOwnerOrReadOnly
+from product.permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
 from product.filter_prodcts import filter_product
 from rest_framework.pagination import PageNumberPagination
@@ -112,13 +112,13 @@ class CreateCommentAPIView(APIView):
 
 # delete comment(just owner can delete it)
 class DeleteCommentView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Comment.objects.all()
 
 
 # edit comment(just owner can edit it)
 class EditCommentView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 

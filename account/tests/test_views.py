@@ -19,9 +19,16 @@ class TestUserRegisterView(APITestCase):
         data = {
             "phone": "0971546012",
         }
+
+        data2 = {
+            "phone": "09712342344546012",
+        }
         response = self.client.post("/account/user-register/", data, format="json")
+        response2 = self.client.post("/account/user-register/", data2, format="json")
+
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data["message"], "Phone number is incorrect")
+        self.assertIn("Phone number is incorrect", response.data["phone"])
+        self.assertIn("Ensure this field has no more than 11 characters.", response2.data["phone"])
 
     def test_user_register_view_without_data(self):
         data = {}
@@ -63,7 +70,7 @@ class TestOtpVerifyView(APITestCase):
     def test_create_user_with_invalid_data(self):
         data = {
             "token": "ebb05731-9c74-4790-8946-514e5f71f76",
-            "code": 136
+            "code": 1360
         }
 
         response = self.client.post(self.url, data, format="json")

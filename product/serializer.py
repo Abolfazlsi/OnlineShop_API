@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from product.models import Product, Category, Color, Size, Comment, Rating, ContactUs
-from account.serializers import UserRegisterSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
