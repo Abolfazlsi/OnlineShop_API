@@ -190,7 +190,7 @@ class TestUserProfileViews(APITestCase):
             ]
         }
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.patch(self.url, data, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["fullname"], "Steve")
 
@@ -215,7 +215,7 @@ class TestUserProfileViews(APITestCase):
             ]
         }
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.patch(self.url, data, format="json")
         self.assertEqual(response.status_code, 400)
 
 

@@ -4,12 +4,11 @@ from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken, Blac
 from rest_framework import viewsets, status, permissions, generics
 from rest_framework.response import Response
 from .models import User, Otp, Address
-from .serializers import UserRegisterSerializer, UserSerializer, AddressSerializer
+from .serializers import UserRegisterSerializer, AddressSerializer, UserSerializer
 from uuid import uuid4
 from random import randint
 from account.tasks import delete_otp
 from product.permissions import IsOwnerOrReadOnly
-import re
 
 
 # login and register with opt system
@@ -91,7 +90,7 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # update details
-    def put(self, request):
+    def patch(self, request):
         user = request.user
         serializer = UserSerializer(instance=user, data=request.data)
         if serializer.is_valid():
