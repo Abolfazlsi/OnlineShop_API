@@ -25,7 +25,6 @@ class UserManager(BaseUserManager):
         return user
 
 
-# مدل یوزر شخصی سازی شده
 class User(AbstractBaseUser):
     email = models.EmailField(
         verbose_name="email address",

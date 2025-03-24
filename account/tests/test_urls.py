@@ -41,7 +41,7 @@ class TestUrls(APITestCase):
 
         self.assertEqual(self.client.get(url).status_code, 200)
         self.assertEqual(resolver.func.view_class, views.UserProfileView)
-        self.assertTrue(hasattr(views.UserProfileView, 'put'))
+        self.assertTrue(hasattr(views.UserProfileView, 'patch'))
         self.assertTrue(hasattr(views.UserProfileView, 'get'))
 
     def test_addresses_list_url_resolves_correct_view(self):
