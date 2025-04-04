@@ -15,7 +15,7 @@ import json
 from django.db import transaction
 
 
-# cart
+# cart detail
 class CartDetailAPIView(APIView):
     def get(self, request):
         cart = Cart(request)
