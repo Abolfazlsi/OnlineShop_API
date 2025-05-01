@@ -27,7 +27,7 @@ class UserRegisterViewSet(viewsets.ViewSet):
             print(code)  # for test
             print(otp.id)
 
-            delete_otp.apply_async(args=[otp.id], countdown=30)
+            # delete_otp.apply_async(args=[otp.id], countdown=30)
 
             return Response({"token": token}, status=status.HTTP_201_CREATED)
 
@@ -49,8 +49,8 @@ class OtpVerifyViewSet(viewsets.ViewSet):
 
             refresh = RefreshToken.for_user(user)
             return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'access_token': str(refresh.access_token),
                 'message': "User logged in successfully"
             }, status=status.HTTP_200_OK)
 

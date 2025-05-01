@@ -33,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    list_display = ("token", 'phone')
+    list_display = ("token", 'phone', "created")
 
 
 @admin.register(Address)

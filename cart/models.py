@@ -1,7 +1,7 @@
 from django.db import models
 from account.models import User
 from product.models import Product
-
+from django.core.validators import  MinValueValidator, MaxValueValidator
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
@@ -34,7 +34,7 @@ class OrderItem(models.Model):
 
 class DiscountCode(models.Model):
     code = models.CharField(max_length=20, unique=True)
-    discount = models.SmallIntegerField(default=0)
+    discount = models.SmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(90)])
     quantity = models.IntegerField(default=1)
 
     def __str__(self):
