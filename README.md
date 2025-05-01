@@ -108,10 +108,18 @@
    ```
    $ celery -A core worker -l info
    ```
+   
    - or
+   
    ```
    $ celery -A core worker -l info --pool=solo
    ```
+   
+   - run celery beat
+     
+     ```
+     $ celery -A proj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseSchedule
+     ```
 
 ---
 
