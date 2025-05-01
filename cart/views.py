@@ -106,7 +106,7 @@ class OrderCreationAPIView(APIView):
 
     def post(self, request):
         cart = Cart(request)
-        if not cart:
+        if cart.is_empty():
             return Response({"message": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             with transaction.atomic():

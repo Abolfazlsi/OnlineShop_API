@@ -52,7 +52,11 @@ class Cart:
     def item_exists(self, id):
         return str(id) in self.cart
 
+    def is_empty(self):
+        return len(self.cart) == 0
+
     # delete product from cart
+
     def delete(self, id):
         if id in self.cart:
             del self.cart[id]
