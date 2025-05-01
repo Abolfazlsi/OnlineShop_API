@@ -27,7 +27,7 @@ class UserRegisterViewSet(viewsets.ViewSet):
             print(code)  # for test
             print(otp.id)
 
-            # delete_otp.apply_async(args=[otp.id], countdown=30)
+            delete_otp.apply_async(args=[otp.id], countdown=120)
 
             return Response({"token": token}, status=status.HTTP_201_CREATED)
 
