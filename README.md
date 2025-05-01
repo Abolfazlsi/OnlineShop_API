@@ -108,7 +108,7 @@
    ```
    $ celery -A core worker -l info
    ```
-or
+   - or
    ```
    $ celery -A core worker -l info --pool=solo
    ```
