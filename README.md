@@ -102,12 +102,15 @@
 - Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for see all of the urls.
 
 - you can go to this url **`http://127.0.0.1:8000/admin/`** to enter the admin panel.(enter the phone and password you set in the previous step)
-4. Run Celery
+4. 💠 Run Celery
+  
    ```
    $ celery -A core worker -l info
    ```
-  or
-  ```
+   
+or
+
+   ```
    $ celery -A core worker -l info --pool=solo
    ```
 
