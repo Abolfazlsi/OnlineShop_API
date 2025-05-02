@@ -118,7 +118,7 @@
    - run celery beat
      
    ```
-   $ celery -A proj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseSchedule
+   $ celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseSchedule
    ```
 
 ---
