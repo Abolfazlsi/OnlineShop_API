@@ -12,6 +12,8 @@
 - [Nginx](https://nginx.org/) ➡️ NGINX is open-source web server software used for reverse proxy, load balancing, and caching.
 - [Celery](https://docs.celeryq.dev/en/stable/) ➡️ Celery is an open source asynchronous task queue or job queue which is based on distributed message passing.
 - [Swagger](https://swagger.io/) ➡️ Swagger API is a set of open-source tools built to help programmers develop, design, document, and use REST APIs.
+- [Rabbitmq](https://www.rabbitmq.com/) ➡️ RabbitMQ is a reliable and mature messaging and streaming broker, which is easy to deploy on cloud environments, on-premises, and on your local machine. It is currently used by millions worldwide.
+- [Redis](https://redis.io/) ➡️ Redis is an in-memory key–value database, used as a distributed cache and message broker, with optional durability.
 
 ---
 
@@ -25,6 +27,7 @@
 - **Filter products**
 - **Search products**
 - **Comment and Rating(Like)**
+- **Session Caching**
 
 ---
 
