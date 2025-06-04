@@ -102,7 +102,7 @@
 
 - you will see this url **`http://127.0.0.1:8000/`** ➡️ Enter this url in a **Browser** or test api apps, like **Postman** and **HTTPie**.
 
-- Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for see all of the urls.
+- Aloso you can go to this url **`http://127.0.0.1:8000/api/schema/swagger-ui/`** for swagger API documentation.
 
 - you can go to this url **`http://127.0.0.1:8000/admin/`** to enter the admin panel.(enter the phone and password you set in the previous step)
 
